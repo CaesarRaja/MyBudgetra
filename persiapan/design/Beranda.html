@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="id" class="light" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MyBudgetra - Beranda</title>
+    <style id="theme-vars">
+:root {
+  --budgetra-background: #f5f7fb;
+  --budgetra-foreground: #0f172a;
+  --budgetra-card: #ffffff;
+  --budgetra-card-strong: #eefcf6;
+  --budgetra-muted: #eef2f7;
+  --budgetra-muted-foreground: #64748b;
+  --budgetra-border: #d7e1ec;
+  --budgetra-primary: #12b981;
+  --budgetra-primary-strong: #0f9f6e;
+  --budgetra-primary-soft: #d8f8ea;
+  --budgetra-surface-container-low: #f8fbfd;
+  --budgetra-surface-container: #ffffff;
+  --budgetra-surface-container-high: #edf7f2;
+  --budgetra-state-success: #10b981;
+  --budgetra-state-warning: #f59e0b;
+  --budgetra-state-error: #ef4444;
+  --budgetra-state-info: #3b82f6;
+  --budgetra-shadow-soft: 0 24px 60px rgba(15, 23, 42, 0.05);
+  --budgetra-shadow-float: 0 22px 48px rgba(15, 23, 42, 0.14);
+  --budgetra-font-display: "Inter", "Plus Jakarta Sans", "Segoe UI", sans-serif;
+  --budgetra-font-body: "Inter", "Plus Jakarta Sans", "Segoe UI", sans-serif;
+  --budgetra-radius-sm: 12px;
+  --budgetra-radius-md: 16px;
+  --budgetra-radius-lg: 16px;
+}
+
+.dark {
+  --budgetra-background: #08111d;
+  --budgetra-foreground: #e8eef8;
+  --budgetra-card: #101b2a;
+  --budgetra-card-strong: #122133;
+  --budgetra-muted: #162234;
+  --budgetra-muted-foreground: #94a3b8;
+  --budgetra-border: #213045;
+  --budgetra-primary: #34d399;
+  --budgetra-primary-strong: #10b981;
+  --budgetra-primary-soft: rgba(52, 211, 153, 0.16);
+  --budgetra-surface-container-low: #101928;
+  --budgetra-surface-container: #111c2b;
+  --budgetra-surface-container-high: #182537;
+  --budgetra-state-success: #34d399;
+  --budgetra-state-warning: #fbbf24;
+  --budgetra-state-error: #f87171;
+  --budgetra-state-info: #60a5fa;
+  --budgetra-shadow-soft: 0 24px 56px rgba(2, 8, 23, 0.4);
+  --budgetra-shadow-float: 0 24px 64px rgba(2, 8, 23, 0.52);
+}
+
+body {
+  font-family: var(--budgetra-font-body);
+}
+
+.budgetra-display {
+  font-family: var(--budgetra-font-display);
+  font-size: clamp(2rem, 4vw, 3.5rem);
+  line-height: 1;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+}
+
+.budgetra-h1 {
+  font-family: var(--budgetra-font-display);
+  font-size: clamp(1.55rem, 2.8vw, 2.2rem);
+  line-height: 1.08;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+.budgetra-h2 {
+  font-family: var(--budgetra-font-display);
+  font-size: clamp(1.18rem, 2vw, 1.5rem);
+  line-height: 1.15;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.budgetra-h3 {
+  font-family: var(--budgetra-font-display);
+  font-size: 1rem;
+  line-height: 1.2;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.budgetra-body {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  font-weight: 500;
+}
+
+.budgetra-caption {
+  font-size: 0.78rem;
+  line-height: 1.45;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.budgetra-label {
+  font-size: 0.82rem;
+  line-height: 1.35;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-background: var(--budgetra-background);
+    --color-foreground: var(--budgetra-foreground);
+    --color-card: var(--budgetra-card);
+    --color-primary: var(--budgetra-primary);
+    --color-muted: var(--budgetra-muted);
+    --color-muted-foreground: var(--budgetra-muted-foreground);
+    --color-border: var(--budgetra-border);
+  }
+  @layer base {
+    body { background: var(--budgetra-background); color: var(--budgetra-foreground); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+    </style>
+</head>
+<body class="bg-[var(--budgetra-background)] text-[var(--budgetra-foreground)]">
+  <main class="min-h-screen pb-32">
+    <div class="mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-6 px-4 pb-10 pt-6 sm:px-6 md:px-8 lg:grid lg:grid-cols-[minmax(0,1fr)_320px] lg:gap-8">
+      <div class="flex flex-col gap-6">
+        <header class="flex items-center justify-between">
+          <div class="min-w-0">
+            <p class="budgetra-caption text-[var(--budgetra-muted-foreground)]">Selasa, 30 Juni</p>
+            <h1 class="budgetra-h2 mt-1 truncate">MyBudgetra</h1>
+          </div>
+          <div class="flex items-center gap-3">
+            <button class="inline-flex h-11 w-11 items-center justify-center rounded-[var(--budgetra-radius-md)] border border-[var(--budgetra-border)] bg-[var(--budgetra-card)] text-[var(--budgetra-foreground)] shadow-[var(--budgetra-shadow-soft)]" aria-label="Cari">
+              <i data-lucide="search" class="h-4 w-4"></i>
+            </button>
+            <div class="flex h-11 w-11 items-center justify-center rounded-[var(--budgetra-radius-md)] bg-[var(--budgetra-primary-soft)] text-sm font-bold text-[var(--budgetra-primary-strong)]">
+              MB
+            </div>
+          </div>
+        </header>
+
+        <section class="overflow-hidden rounded-[16px] border border-[color:rgba(255,255,255,0.45)] p-5 text-white shadow-[var(--budgetra-shadow-float)]" style="background: linear-gradient(145deg, var(--budgetra-foreground) 0%, var(--budgetra-primary-strong) 52%, var(--budgetra-primary) 100%);">
+          <div class="flex items-start justify-between gap-4">
+            <div class="min-w-0">
+              <p class="budgetra-caption text-white/70">Ringkasan hari ini</p>
+              <h2 class="budgetra-h1 mt-2 max-w-[14ch]" style="text-wrap: balance; word-break: keep-all; overflow-wrap: break-word;">Uang Anda masih aman hari ini</h2>
+              <p class="budgetra-body mt-3 max-w-[30ch] text-white/80">Pengeluaran hari ini Rp 148.000, masih 18% di bawah rata-rata 30 hari terakhir.</p>
+            </div>
+            <div class="shrink-0 rounded-[var(--budgetra-radius-md)] bg-white/12 px-3 py-2 text-right backdrop-blur">
+              <p class="budgetra-caption whitespace-nowrap text-white/65">Sisa budget</p>
+              <p class="mt-1 whitespace-nowrap text-lg font-bold tracking-[-0.03em]">Rp 2,4 jt</p>
+            </div>
+          </div>
+
+          <div class="mt-6 grid gap-3 sm:grid-cols-3">
+            <div class="rounded-[var(--budgetra-radius-md)] bg-white/10 p-3">
+              <p class="budgetra-caption text-white/65">Saldo aktif</p>
+              <p class="mt-2 text-2xl font-bold tracking-[-0.04em] whitespace-nowrap">Rp 8,9 jt</p>
+            </div>
+            <div class="rounded-[var(--budgetra-radius-md)] bg-white/10 p-3">
+              <p class="budgetra-caption text-white/65">Pemasukan</p>
+              <p class="mt-2 text-2xl font-bold tracking-[-0.04em] whitespace-nowrap">Rp 520 rb</p>
+            </div>
+            <div class="rounded-[var(--budgetra-radius-md)] bg-white/10 p-3">
+              <p class="budgetra-caption text-white/65">Pengeluaran</p>
+              <p class="mt-2 text-2xl font-bold tracking-[-0.04em] whitespace-nowrap">Rp 148 rb</p>
+            </div>
+          </div>
+
+          <div class="mt-6 flex items-center justify-between gap-3">
+            <a data-dom-id="cta-transaksi" href="#" class="inline-flex min-w-0 items-center justify-center gap-2 rounded-[var(--budgetra-radius-md)] bg-white px-4 py-3 text-sm font-semibold text-[var(--budgetra-foreground)] shadow-[var(--budgetra-shadow-soft)]">
+              <i data-lucide="plus" class="h-4 w-4"></i>
+              Lihat transaksi
+            </a>
+            <div class="flex items-center gap-2 text-sm text-white/75">
+              <i data-lucide="sparkles" class="h-4 w-4"></i>
+              Hemat konsisten
+            </div>
+          </div>
+        </section>
+
+        <section class="rounded-[var(--budgetra-radius-lg)] border border-[var(--budgetra-border)] bg-[var(--budgetra-card)] p-4 shadow-[var(--budgetra-shadow-soft)]">
+          <div class="flex items-start justify-between gap-3">
+            <div class="min-w-0">
+              <p class="budgetra-caption text-[var(--budgetra-muted-foreground)]">Budget bulan ini</p>
+              <h3 class="budgetra-h2 mt-1 truncate">Masih terkendali</h3>
+            </div>
+            <span class="inline-flex shrink-0 items-center rounded-[var(--budgetra-radius-sm)] bg-[var(--budgetra-primary-soft)] px-3 py-1 text-xs font-semibold text-[var(--budgetra-primary-strong)]">72% terpakai</span>
+          </div>
+          <div class="mt-4 space-y-4">
+            <div>
+              <div class="flex items-center justify-between gap-3">
+                <p class="truncate text-sm font-semibold">Makan</p>
+                <p class="budgetra-caption whitespace-nowrap text-[var(--budgetra-muted-foreground)]">Rp 1,2 jt / 1,6 jt</p>
+              </div>
+              <div class="mt-2 h-2 rounded-full bg-[var(--budgetra-muted)]">
+                <div class="h-2 rounded-full bg-[var(--budgetra-primary)]" style="width: 75%"></div>
+              </div>
+            </div>
+            <div>
+              <div class="flex items-center justify-between gap-3">
+                <p class="truncate text-sm font-semibold">Transport</p>
+                <p class="budgetra-caption whitespace-nowrap text-[var(--budgetra-muted-foreground)]">Rp 520 rb / 700 rb</p>
+              </div>
+              <div class="mt-2 h-2 rounded-full bg-[var(--budgetra-muted)]">
+                <div class="h-2 rounded-full bg-[var(--budgetra-state-info)]" style="width: 74%"></div>
+              </div>
+            </div>
+            <div>
+              <div class="flex items-center justify-between gap-3">
+                <p class="truncate text-sm font-semibold">Tagihan</p>
+                <p class="budgetra-caption whitespace-nowrap text-[var(--budgetra-muted-foreground)]">Rp 860 rb / 900 rb</p>
+              </div>
+              <div class="mt-2 h-2 rounded-full bg-[var(--budgetra-muted)]">
+                <div class="h-2 rounded-full bg-[var(--budgetra-state-warning)]" style="width: 95%"></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="grid gap-4 md:grid-cols-2">
+          <div class="rounded-[var(--budgetra-radius-lg)] border border-[var(--budgetra-border)] bg-[var(--budgetra-card)] p-4 shadow-[var(--budgetra-shadow-soft)]">
+            <div class="flex items-center justify-between gap-3">
+              <div>
+                <p class="budgetra-caption text-[var(--budgetra-muted-foreground)]">Tagihan dekat</p>
+                <h3 class="budgetra-h3 mt-1">Prioritas minggu ini</h3>
+              </div>
+              <i data-lucide="bell-ring" class="h-5 w-5 text-[var(--budgetra-primary)]"></i>
+            </div>
+            <div class="mt-4 space-y-3">
+              <div class="flex items-center justify-between gap-3 rounded-[var(--budgetra-radius-md)] bg-[var(--budgetra-surface-container-low)] p-3">
+                <div class="min-w-0">
+                  <p class="truncate text-sm font-semibold">Internet rumah</p>
+                  <p class="budgetra-caption truncate text-[var(--budgetra-muted-foreground)]">Jatuh tempo 1 Juli</p>
+                </div>
+                <span class="shrink-0 whitespace-nowrap text-sm font-semibold">Rp 349 rb</span>
+              </div>
+              <div class="flex items-center justify-between gap-3 rounded-[var(--budgetra-radius-md)] bg-[var(--budgetra-surface-container-low)] p-3">
+                <div class="min-w-0">
+                  <p class="truncate text-sm font-semibold">Asuransi</p>
+                  <p class="budgetra-caption truncate text-[var(--budgetra-muted-foreground)]">Jatuh tempo 3 Juli</p>
+                </div>
+                <span class="shrink-0 whitespace-nowrap text-sm font-semibold">Rp 220 rb</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="rounded-[var(--budgetra-radius-lg)] border border-[var(--budgetra-border)] bg-[var(--budgetra-card)] p-4 shadow-[var(--budgetra-shadow-soft)]">
+            <div class="flex items-center justify-between gap-3">
+              <div>
+                <p class="budgetra-caption text-[var(--budgetra-muted-foreground)]">Target tabungan</p>
+                <h3 class="budgetra-h3 mt-1">Beli laptop baru</h3>
+              </div>
+              <span class="inline-flex h-10 w-10 items-center justify-center rounded-[var(--budgetra-radius-md)] bg-[var(--budgetra-primary-soft)] text-[var(--budgetra-primary-strong)]">
+                <i data-lucide="target" class="h-4 w-4"></i>
+              </span>
+            </div>
+            <div class="mt-4 rounded-[var(--budgetra-radius-md)] bg-[var(--budgetra-surface-container-low)] p-4">
+              <div class="flex items-end justify-between gap-3">
+                <div class="min-w-0">
+                  <p class="budgetra-caption text-[var(--budgetra-muted-foreground)]">Terkumpul</p>
+                  <p class="mt-1 text-2xl font-bold tracking-[-0.04em] whitespace-nowrap">Rp 5 jt</p>
+                </div>
+                <p class="budgetra-caption whitespace-nowrap text-[var(--budgetra-primary-strong)]">62%</p>
+              </div>
+              <div class="mt-3 h-2 rounded-full bg-[var(--budgetra-muted)]">
+                <div class="h-2 rounded-full bg-[var(--budgetra-primary)]" style="width: 62%"></div>
+              </div>
+              <p class="budgetra-caption mt-3 text-[var(--budgetra-muted-foreground)]">Naik 14% lebih cepat dari target bulan lalu.</p>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <aside class="hidden lg:flex lg:flex-col lg:gap-4 lg:pt-20">
+        <section class="rounded-[16px] border border-[var(--budgetra-border)] bg-[var(--budgetra-card)] p-5 shadow-[var(--budgetra-shadow-soft)]">
+          <p class="budgetra-caption text-[var(--budgetra-muted-foreground)]">Insight cepat</p>
+          <h2 class="budgetra-h2 mt-2" style="text-wrap: balance; word-break: keep-all; overflow-wrap: break-word;">Kebiasaan Anda makin stabil</h2>
+          <div class="mt-5 space-y-4">
+            <div class="rounded-[var(--budgetra-radius-md)] bg-[var(--budgetra-surface-container-low)] p-4">
+              <p class="budgetra-caption text-[var(--budgetra-muted-foreground)]">Jam rawan belanja</p>
+              <p class="mt-1 text-lg font-semibold">19.00 - 21.00</p>
+            </div>
+            <div class="rounded-[var(--budgetra-radius-md)] bg-[var(--budgetra-surface-container-low)] p-4">
+              <p class="budgetra-caption text-[var(--budgetra-muted-foreground)]">Kategori tersering</p>
+              <p class="mt-1 text-lg font-semibold">Makan & transport</p>
+            </div>
+          </div>
+        </section>
+      </aside>
+    </div>
+
+    <button class="fixed bottom-24 right-4 inline-flex h-14 w-14 items-center justify-center rounded-[16px] bg-[var(--budgetra-primary)] text-white shadow-[var(--budgetra-shadow-float)] sm:right-6 md:right-8 lg:right-10" aria-label="Tambah transaksi">
+      <i data-lucide="plus" class="h-6 w-6"></i>
+    </button>
+
+    <nav class="fixed inset-x-0 bottom-0 border-t border-[var(--budgetra-border)] bg-white/95 px-4 py-3 backdrop-blur">
+      <div class="mx-auto flex max-w-md items-center justify-between gap-2 rounded-[16px] border border-[var(--budgetra-border)] bg-[var(--budgetra-card)] px-2 py-2 shadow-[var(--budgetra-shadow-soft)]">
+        <span class="flex min-w-0 flex-1 flex-col items-center gap-1 rounded-[18px] bg-[var(--budgetra-primary-soft)] px-2 py-2 text-[var(--budgetra-primary-strong)]">
+          <i data-lucide="house" class="h-4 w-4"></i>
+          <span class="truncate text-[11px] font-semibold">Beranda</span>
+        </span>
+        <a data-dom-id="nav-transaksi" href="#" class="flex min-w-0 flex-1 flex-col items-center gap-1 rounded-[18px] px-2 py-2 text-[var(--budgetra-muted-foreground)]">
+          <i data-lucide="receipt-text" class="h-4 w-4"></i>
+          <span class="truncate text-[11px] font-medium">Transaksi</span>
+        </a>
+        <a data-dom-id="nav-budget" href="#" class="flex min-w-0 flex-1 flex-col items-center gap-1 rounded-[18px] px-2 py-2 text-[var(--budgetra-muted-foreground)]">
+          <i data-lucide="wallet" class="h-4 w-4"></i>
+          <span class="truncate text-[11px] font-medium">Budget</span>
+        </a>
+        <a data-dom-id="nav-piutang" href="#" class="flex min-w-0 flex-1 flex-col items-center gap-1 rounded-[18px] px-2 py-2 text-[var(--budgetra-muted-foreground)]">
+          <i data-lucide="hand-coins" class="h-4 w-4"></i>
+          <span class="truncate text-[11px] font-medium">Piutang</span>
+        </a>
+        <a data-dom-id="nav-laporan" href="#" class="flex min-w-0 flex-1 flex-col items-center gap-1 rounded-[18px] px-2 py-2 text-[var(--budgetra-muted-foreground)]">
+          <i data-lucide="chart-column" class="h-4 w-4"></i>
+          <span class="truncate text-[11px] font-medium">Laporan</span>
+        </a>
+      </div>
+    </nav>
+  </main>
+  <script>lucide.createIcons();</script>
+</body>
+</html>
