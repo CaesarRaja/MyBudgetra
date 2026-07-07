@@ -237,7 +237,7 @@ class _DebtPageState extends State<DebtPage> {
                   const SizedBox(height: 12),
                   Card(
                     child: Padding(
-                      padding: const EdgeInsets.all(8),
+                      padding: const EdgeInsets.all(16),
                       child: Column(
                         children: _debts.map((d) => Column(
                           children: [

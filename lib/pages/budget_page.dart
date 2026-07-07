@@ -324,8 +324,8 @@ class _EnvelopeCard extends StatelessWidget {
 
     return Card(
       child: InkWell(
-        borderRadius: BorderRadius.circular(12),
-        onTap: onTap,
+          borderRadius: BorderRadius.circular(16),
+          onTap: onTap,
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Column(
@@ -343,7 +343,7 @@ class _EnvelopeCard extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(envelope.name, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15)),
+                        Text(envelope.name, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15), overflow: TextOverflow.ellipsis),
                         Text(
                           isLinked ? 'Auto: ${envelope.categoryName ?? ''}' : 'Manual',
                           style: TextStyle(fontSize: 11, color: BudgetraColors.lightMutedFg),

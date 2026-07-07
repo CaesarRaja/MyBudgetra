@@ -206,7 +206,7 @@ class _TransactionPageState extends State<TransactionPage> {
                       onTap: _prevMonth,
                       child: Container(
                         padding: const EdgeInsets.all(4),
-                        decoration: BoxDecoration(color: BudgetraColors.lightMuted, borderRadius: BorderRadius.circular(6)),
+                        decoration: BoxDecoration(color: BudgetraColors.lightMuted, borderRadius: BorderRadius.circular(8)),
                         child: Icon(Icons.chevron_left_rounded, size: 16, color: BudgetraColors.lightFg),
                       ),
                     ),
@@ -217,7 +217,7 @@ class _TransactionPageState extends State<TransactionPage> {
                       onTap: _nextMonth,
                       child: Container(
                         padding: const EdgeInsets.all(4),
-                        decoration: BoxDecoration(color: BudgetraColors.lightMuted, borderRadius: BorderRadius.circular(6)),
+                        decoration: BoxDecoration(color: BudgetraColors.lightMuted, borderRadius: BorderRadius.circular(8)),
                         child: Icon(Icons.chevron_right_rounded, size: 16, color: BudgetraColors.lightFg),
                       ),
                     ),
@@ -256,7 +256,7 @@ class _TransactionPageState extends State<TransactionPage> {
                           onTap: () => setState(() => _filterCategoryId = null),
                           child: Container(
                             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                            decoration: BoxDecoration(color: BudgetraColors.error.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(6)),
+                            decoration: BoxDecoration(color: BudgetraColors.error.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(8)),
                             child: Text('Reset', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: BudgetraColors.error)),
                           ),
                         ),
@@ -277,7 +277,7 @@ class _TransactionPageState extends State<TransactionPage> {
                   const SizedBox(height: 20),
                   Card(
                     child: Padding(
-                      padding: const EdgeInsets.all(8),
+                      padding: const EdgeInsets.all(16),
                       child: Column(
                         children: filtered.map((t) => Column(
                           children: [
