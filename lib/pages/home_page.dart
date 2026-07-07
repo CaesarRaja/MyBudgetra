@@ -12,7 +12,7 @@ class HomePage extends StatefulWidget {
   HomePageState createState() => HomePageState();
 }
 
-class HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin {
+class HomePageState extends State<HomePage> {
   final _repo = TransactionRepository();
   Map<String, dynamic> _summary = {};
   List<TransactionModel> _recent = [];
@@ -44,11 +44,7 @@ class HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin {
   }
 
   @override
-  bool get wantKeepAlive => true;
-
-  @override
   Widget build(BuildContext context) {
-    super.build(context);
     final today = DateFormat('EEEE, d MMMM', 'id').format(DateTime.now());
     final expense = _summary['todayExpense'] as int? ?? 0;
     final income = _summary['todayIncome'] as int? ?? 0;

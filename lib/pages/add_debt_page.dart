@@ -63,6 +63,7 @@ class _AddDebtSheetState extends State<_AddDebtSheet> {
     }
 
     setState(() => _loading = true);
+    bool navigated = false;
     try {
       final user = SupabaseConfig.client.auth.currentUser!;
       final amount = int.tryParse(_amountController.text.replaceAll('.', '')) ?? 0;
@@ -92,16 +93,18 @@ class _AddDebtSheetState extends State<_AddDebtSheet> {
           ),
         );
       }
-      if (mounted) Navigator.pop(context, true);
+      if (mounted) {
+        Navigator.pop(context, true);
+        navigated = true;
+      }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('$e'), backgroundColor: BudgetraColors.error),
         );
       }
-    } finally {
-      if (mounted) setState(() => _loading = false);
     }
+    if (!navigated && mounted) setState(() => _loading = false);
   }
 
   @override

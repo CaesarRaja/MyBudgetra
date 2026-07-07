@@ -19,6 +19,7 @@ class _SignupPageState extends State<SignupPage> {
 
   Future<void> _signup() async {
     setState(() => _loading = true);
+    bool navigated = false;
     try {
       await SupabaseConfig.client.auth.signUp(
         email: _emailController.text.trim(),
@@ -33,6 +34,7 @@ class _SignupPageState extends State<SignupPage> {
           ),
         );
         Navigator.pop(context);
+        navigated = true;
       }
     } catch (e) {
       if (mounted) {
@@ -40,9 +42,8 @@ class _SignupPageState extends State<SignupPage> {
           SnackBar(content: Text('$e'), backgroundColor: BudgetraColors.error),
         );
       }
-    } finally {
-      if (mounted) setState(() => _loading = false);
     }
+    if (!navigated && mounted) setState(() => _loading = false);
   }
 
   @override

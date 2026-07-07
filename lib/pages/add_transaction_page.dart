@@ -8,6 +8,53 @@ import '../repositories/transaction_repository.dart';
 import '../widgets/stats_card.dart';
 import 'manage_category_page.dart';
 
+class CurrencyInputFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    if (newValue.text.isEmpty) {
+      return newValue.copyWith(text: '');
+    }
+
+    final digits = newValue.text.replaceAll(RegExp(r'[^0-9]'), '');
+    if (digits.isEmpty) {
+      return newValue.copyWith(text: '');
+    }
+
+    final formatted = _formatWithCommas(int.parse(digits));
+
+    int cursorPosition = newValue.selection.start;
+    if (cursorPosition > newValue.text.length) {
+      cursorPosition = newValue.text.length;
+    }
+
+    final int dotsBeforeCursor = _countDotsBeforePosition(formatted, cursorPosition);
+    final int newCursorPosition = cursorPosition + dotsBeforeCursor;
+
+    return TextEditingValue(
+      text: formatted,
+      selection: TextSelection.collapsed(offset: newCursorPosition),
+    );
+  }
+
+  String _formatWithCommas(int value) {
+    return value.toString().replaceAllMapped(
+      RegExp(r'(\d)(?=(\d{3})+(?!\d))'),
+      (Match m) => '${m[1]}.',
+    );
+  }
+
+  int _countDotsBeforePosition(String text, int position) {
+    int count = 0;
+    for (int i = 0; i < position && i < text.length; i++) {
+      if (text[i] == '.') count++;
+    }
+    return count;
+  }
+}
+
 Future<bool?> showAddTransactionSheet(BuildContext context, {TransactionModel? transaction}) {
   return showModalBottomSheet<bool>(
     context: context,
@@ -88,6 +135,7 @@ class _AddTransactionSheetState extends State<_AddTransactionSheet> {
     }
 
     setState(() => _loading = true);
+    bool navigated = false;
     try {
       final user = SupabaseConfig.client.auth.currentUser!;
       final amount = int.tryParse(_amountController.text.replaceAll('.', '')) ?? 0;
@@ -117,16 +165,18 @@ class _AddTransactionSheetState extends State<_AddTransactionSheet> {
           ),
         );
       }
-      if (mounted) Navigator.pop(context, true);
+      if (mounted) {
+        Navigator.pop(context, true);
+        navigated = true;
+      }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('$e'), backgroundColor: BudgetraColors.error),
         );
       }
-    } finally {
-      if (mounted) setState(() => _loading = false);
     }
+    if (!navigated && mounted) setState(() => _loading = false);
   }
 
   @override
@@ -231,20 +281,20 @@ class _AddTransactionSheetState extends State<_AddTransactionSheet> {
                         Text('Rp', style: TextStyle(fontSize: 28, fontWeight: FontWeight.w800, color: BudgetraColors.lightMutedFg)),
                         const SizedBox(width: 12),
                         Expanded(
-                          child: TextField(
-                            controller: _amountController,
-                            keyboardType: TextInputType.number,
-                            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                            style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w800, letterSpacing: -0.03),
-                            decoration: InputDecoration(
-                              hintText: '0',
-                              hintStyle: TextStyle(color: BudgetraColors.lightMutedFg.withValues(alpha: 0.3)),
-                              border: InputBorder.none,
-                              filled: false,
-                              contentPadding: EdgeInsets.zero,
-                              isDense: true,
-                            ),
-                          ),
+child: TextField(
+                      controller: _amountController,
+                      keyboardType: TextInputType.number,
+                      inputFormatters: [CurrencyInputFormatter()],
+                      style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w800, letterSpacing: -0.03),
+                      decoration: InputDecoration(
+                        hintText: '0',
+                        hintStyle: TextStyle(color: BudgetraColors.lightMutedFg.withValues(alpha: 0.3)),
+                        border: InputBorder.none,
+                        filled: false,
+                        contentPadding: EdgeInsets.zero,
+                        isDense: true,
+                      ),
+                    ),
                         ),
                         if (_amountController.text.isNotEmpty)
                           GestureDetector(

@@ -20,7 +20,9 @@ class _LoginPageState extends State<LoginPage> {
   @override
   void initState() {
     super.initState();
-    _checkSession();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkSession();
+    });
   }
 
   void _checkSession() {
@@ -34,6 +36,7 @@ class _LoginPageState extends State<LoginPage> {
 
   Future<void> _login() async {
     setState(() => _loading = true);
+    bool navigated = false;
     try {
       await SupabaseConfig.client.auth.signInWithPassword(
         email: _emailController.text.trim(),
@@ -44,6 +47,7 @@ class _LoginPageState extends State<LoginPage> {
           context,
           MaterialPageRoute(builder: (_) => const MainShell()),
         );
+        navigated = true;
       }
     } catch (e) {
       if (mounted) {
@@ -51,9 +55,8 @@ class _LoginPageState extends State<LoginPage> {
           SnackBar(content: Text('$e'), backgroundColor: BudgetraColors.error),
         );
       }
-    } finally {
-      if (mounted) setState(() => _loading = false);
     }
+    if (!navigated && mounted) setState(() => _loading = false);
   }
 
   @override

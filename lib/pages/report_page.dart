@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:intl/intl.dart';
 import '../config/theme.dart';
+import '../models/transaction_model.dart';
 import '../repositories/transaction_repository.dart';
+import '../services/export_service.dart';
 
 class ReportPage extends StatefulWidget {
   const ReportPage({super.key});
@@ -18,6 +21,7 @@ class ReportPageState extends State<ReportPage> {
   List<Map<String, dynamic>> _history = [];
   List<Map<String, dynamic>> _weekly = [];
   List<Map<String, dynamic>> _categoryExpense = [];
+  List<TransactionModel> _transactions = [];
 
   @override
   void initState() {
@@ -30,11 +34,13 @@ class ReportPageState extends State<ReportPage> {
   Future<void> _load() async {
     setState(() => _loading = true);
     try {
+      final now = DateTime.now();
       final results = await Future.wait([
         _repo.getMonthlyReport(),
         _repo.getMonthlyHistory(),
         _repo.getWeeklyExpense(),
         _repo.getExpenseByCategory(),
+        _repo.getTransactions(month: now.month, year: now.year),
       ]);
       if (mounted) {
         setState(() {
@@ -42,12 +48,102 @@ class ReportPageState extends State<ReportPage> {
           _history = results[1] as List<Map<String, dynamic>>;
           _weekly = results[2] as List<Map<String, dynamic>>;
           _categoryExpense = results[3] as List<Map<String, dynamic>>;
+          _transactions = results[4] as List<TransactionModel>;
           _loading = false;
         });
       }
     } catch (_) {
       if (mounted) setState(() => _loading = false);
-    }
+  }
+}
+
+  void _showExportSheet() {
+    final income = _monthly['income'] as int? ?? 0;
+    final expense = _monthly['expense'] as int? ?? 0;
+    final now = DateTime.now();
+    final monthLabel = DateFormat('MMMM yyyy', 'id').format(now);
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => Container(
+        padding: const EdgeInsets.all(24),
+        decoration: const BoxDecoration(
+          color: BudgetraColors.lightCard,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Center(
+              child: Container(
+                width: 36, height: 4,
+                decoration: BoxDecoration(color: BudgetraColors.lightMutedFg.withValues(alpha: 0.3), borderRadius: BorderRadius.circular(2)),
+              ),
+            ),
+            const SizedBox(height: 16),
+            const Text('Export Laporan', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
+            const SizedBox(height: 4),
+            Text(monthLabel, style: TextStyle(fontSize: 13, color: BudgetraColors.lightMutedFg)),
+            const SizedBox(height: 24),
+            Row(
+              children: [
+                Expanded(
+                  child: _ExportOption(
+                    icon: Icons.table_chart_rounded,
+                    label: 'CSV',
+                    desc: 'Buka di Excel',
+                    color: BudgetraColors.info,
+                    onTap: () async {
+                      await ExportService().exportToCsv(
+                        title: 'Laporan Keuangan - $monthLabel',
+                        income: income,
+                        expense: expense,
+                        transactions: _transactions,
+                      );
+                      if (ctx.mounted) Navigator.pop(ctx);
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('CSV tersimpan'), backgroundColor: BudgetraColors.success),
+                          );
+                        }
+                      });
+                    },
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: _ExportOption(
+                    icon: Icons.picture_as_pdf_rounded,
+                    label: 'PDF',
+                    desc: 'Dokumen rapi',
+                    color: BudgetraColors.error,
+                    onTap: () async {
+                      await ExportService().exportToPdf(
+                        title: 'Laporan Keuangan - $monthLabel',
+                        income: income,
+                        expense: expense,
+                        transactions: _transactions,
+                      );
+                      if (ctx.mounted) Navigator.pop(ctx);
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('PDF tersimpan'), backgroundColor: BudgetraColors.success),
+                          );
+                        }
+                      });
+                    },
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+          ],
+        ),
+      ),
+    );
   }
 
   @override
@@ -71,9 +167,27 @@ class ReportPageState extends State<ReportPage> {
               child: ListView(
                 padding: const EdgeInsets.fromLTRB(20, 16, 20, 100),
                 children: [
-                  Text('Laporan keuangan', style: Theme.of(context).textTheme.headlineMedium),
-                  const SizedBox(height: 4),
-                  Text('Visualisasi mingguan & bulanan', style: TextStyle(fontSize: 13, color: BudgetraColors.lightMutedFg)),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Laporan keuangan', style: Theme.of(context).textTheme.headlineMedium),
+                          const SizedBox(height: 4),
+                          Text('Visualisasi mingguan & bulanan', style: TextStyle(fontSize: 13, color: BudgetraColors.lightMutedFg)),
+                        ],
+                      ),
+                      GestureDetector(
+                        onTap: _showExportSheet,
+                        child: Container(
+                          width: 40, height: 40,
+                          decoration: BoxDecoration(color: BudgetraColors.primarySoft, borderRadius: BorderRadius.circular(12)),
+                          child: Icon(Icons.share_rounded, color: BudgetraColors.primaryStrong, size: 20),
+                        ),
+                      ),
+                    ],
+                  ),
                   const SizedBox(height: 20),
                   Container(
                     padding: const EdgeInsets.all(20),
@@ -474,6 +588,39 @@ class _MiniCard extends StatelessWidget {
                 overflow: TextOverflow.ellipsis, maxLines: 1),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ExportOption extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String desc;
+  final Color color;
+  final VoidCallback onTap;
+  const _ExportOption({required this.icon, required this.label, required this.desc, required this.color, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.08),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: color.withValues(alpha: 0.2)),
+        ),
+        child: Column(
+          children: [
+            Icon(icon, size: 36, color: color),
+            const SizedBox(height: 8),
+            Text(label, style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16, color: color)),
+            const SizedBox(height: 4),
+            Text(desc, style: TextStyle(fontSize: 11, color: BudgetraColors.lightMutedFg)),
+          ],
         ),
       ),
     );
