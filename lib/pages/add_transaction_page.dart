@@ -6,6 +6,7 @@ import '../models/transaction_model.dart';
 import '../models/category_model.dart';
 import '../repositories/transaction_repository.dart';
 import '../widgets/stats_card.dart';
+import 'manage_category_page.dart';
 
 Future<bool?> showAddTransactionSheet(BuildContext context, {TransactionModel? transaction}) {
   return showModalBottomSheet<bool>(
@@ -254,9 +255,22 @@ class _AddTransactionSheetState extends State<_AddTransactionSheet> {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text('Pilih kategori', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: BudgetraColors.lightMutedFg)),
+                  Row(
+                    children: [
+                      Text('Pilih kategori', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: BudgetraColors.lightMutedFg)),
+                      const Spacer(),
+                      GestureDetector(
+                        onTap: () async {
+                          await showManageCategorySheet(context);
+                          _loadCategories();
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: BoxDecoration(color: BudgetraColors.lightMuted, borderRadius: BorderRadius.circular(8)),
+                          child: Icon(Icons.settings_rounded, size: 16, color: BudgetraColors.lightMutedFg),
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 8),
                   SizedBox(

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../config/supabase.dart';
 import '../config/theme.dart';
-import '../repositories/transaction_repository.dart';
 import '../widgets/bottom_nav.dart';
 import 'home_page.dart';
 import 'transaction_page.dart';
@@ -20,21 +19,16 @@ class MainShell extends StatefulWidget {
 class _MainShellState extends State<MainShell> {
   int _currentIndex = 0;
   final _homeKey = GlobalKey<HomePageState>();
+  final _reportKey = GlobalKey<ReportPageState>();
 
   @override
   void initState() {
     super.initState();
-    _seedCategories();
-  }
-
-  Future<void> _seedCategories() async {
-    try {
-      await TransactionRepository().seedDefaultCategories();
-    } catch (_) {}
   }
 
   void _onTransactionAdded() {
     _homeKey.currentState?.refresh();
+    _reportKey.currentState?.refresh();
   }
 
   Future<void> _logout() async {
@@ -89,7 +83,7 @@ class _MainShellState extends State<MainShell> {
           TransactionPage(onTransactionAdded: _onTransactionAdded),
           const BudgetPage(),
           const DebtPage(),
-          const ReportPage(),
+          ReportPage(key: _reportKey),
         ],
       ),
       bottomNavigationBar: BottomNav(
@@ -97,6 +91,7 @@ class _MainShellState extends State<MainShell> {
         onTap: (i) {
           setState(() => _currentIndex = i);
           if (i == 0) _homeKey.currentState?.refresh();
+          if (i == 4) _reportKey.currentState?.refresh();
         },
       ),
     );

@@ -1,3 +1,4 @@
+import 'package:intl/intl.dart';
 import '../config/supabase.dart';
 import '../models/transaction_model.dart';
 import '../models/category_model.dart';
@@ -11,7 +12,6 @@ class TransactionRepository {
     final data = await _client
         .from('categories')
         .select()
-        .or('user_id.eq.$_userId,is_default.eq.true')
         .order('name');
     return (data as List).map((e) => CategoryModel.fromMap(e as Map<String, dynamic>)).toList();
   }
@@ -94,41 +94,174 @@ class TransactionRepository {
     };
   }
 
-  Future<void> seedDefaultCategories() async {
-    await _client
-        .from('categories')
-        .delete()
-        .eq('is_default', true)
-        .eq('user_id', _userId);
-      final defaults = [
-        // Pengeluaran (18)
-        {'name': 'Makan & Minum', 'icon': 'restaurant', 'color': '#12B981', 'type': 'expense', 'is_default': true, 'user_id': _userId},
-        {'name': 'Transportasi', 'icon': 'car', 'color': '#3B82F6', 'type': 'expense', 'is_default': true, 'user_id': _userId},
-        {'name': 'Tagihan', 'icon': 'receipt', 'color': '#F59E0B', 'type': 'expense', 'is_default': true, 'user_id': _userId},
-        {'name': 'Belanja', 'icon': 'bag', 'color': '#EF4444', 'type': 'expense', 'is_default': true, 'user_id': _userId},
-        {'name': 'Hiburan', 'icon': 'gamepad', 'color': '#8B5CF6', 'type': 'expense', 'is_default': true, 'user_id': _userId},
-        {'name': 'Kesehatan', 'icon': 'heart', 'color': '#EC4899', 'type': 'expense', 'is_default': true, 'user_id': _userId},
-        {'name': 'Pendidikan', 'icon': 'school', 'color': '#06B6D4', 'type': 'expense', 'is_default': true, 'user_id': _userId},
-        {'name': 'Kebutuhan Rumah', 'icon': 'home', 'color': '#14B8A6', 'type': 'expense', 'is_default': true, 'user_id': _userId},
-        {'name': 'Internet & Pulsa', 'icon': 'wifi', 'color': '#0EA5E9', 'type': 'expense', 'is_default': true, 'user_id': _userId},
-        {'name': 'Paket Langganan', 'icon': 'subscriptions', 'color': '#F43F5E', 'type': 'expense', 'is_default': true, 'user_id': _userId},
-        {'name': 'Asuransi', 'icon': 'health_and_safety', 'color': '#EC4899', 'type': 'expense', 'is_default': true, 'user_id': _userId},
-        {'name': 'Donasi & Zakat', 'icon': 'volunteer_activism', 'color': '#F97316', 'type': 'expense', 'is_default': true, 'user_id': _userId},
-        {'name': 'Pakaian', 'icon': 'checkroom', 'color': '#A855F7', 'type': 'expense', 'is_default': true, 'user_id': _userId},
-        {'name': 'Perawatan Diri', 'icon': 'spa', 'color': '#F472B6', 'type': 'expense', 'is_default': true, 'user_id': _userId},
-        {'name': 'Olahraga', 'icon': 'fitness_center', 'color': '#22C55E', 'type': 'expense', 'is_default': true, 'user_id': _userId},
-        {'name': 'Liburan & Travel', 'icon': 'flight', 'color': '#06B6D4', 'type': 'expense', 'is_default': true, 'user_id': _userId},
-        {'name': 'Hewan Peliharaan', 'icon': 'pets', 'color': '#FB923C', 'type': 'expense', 'is_default': true, 'user_id': _userId},
-        {'name': 'Lainnya', 'icon': 'more_horiz', 'color': '#94A3B8', 'type': 'expense', 'is_default': true, 'user_id': _userId},
-        // Pemasukan (7)
-        {'name': 'Gaji', 'icon': 'account_balance_wallet', 'color': '#12B981', 'type': 'income', 'is_default': true, 'user_id': _userId},
-        {'name': 'Freelance', 'icon': 'laptop', 'color': '#F97316', 'type': 'income', 'is_default': true, 'user_id': _userId},
-        {'name': 'Investasi', 'icon': 'trending_up', 'color': '#06B6D4', 'type': 'income', 'is_default': true, 'user_id': _userId},
-        {'name': 'Bonus & THR', 'icon': 'card_giftcard', 'color': '#EF4444', 'type': 'income', 'is_default': true, 'user_id': _userId},
-        {'name': 'Bisnis', 'icon': 'analytics', 'color': '#6366F1', 'type': 'income', 'is_default': true, 'user_id': _userId},
-        {'name': 'Hadiah', 'icon': 'redeem', 'color': '#EC4899', 'type': 'income', 'is_default': true, 'user_id': _userId},
-        {'name': 'Pendapatan Lain', 'icon': 'attach_money', 'color': '#94A3B8', 'type': 'income', 'is_default': true, 'user_id': _userId},
-      ];
-      await _client.from('categories').insert(defaults);
+  Future<Map<String, dynamic>> getMonthlyReport() async {
+    final now = DateTime.now();
+    final monthStart = DateTime(now.year, now.month, 1).toIso8601String().split('T')[0];
+    final nextMonth = DateTime(now.year, now.month + 1, 0).toIso8601String().split('T')[0];
+
+    final data = await _client
+        .from('transactions')
+        .select('amount, type, category_id, date, categories(name)')
+        .eq('user_id', _userId)
+        .gte('date', monthStart)
+        .lte('date', nextMonth);
+
+    int income = 0, expense = 0;
+    final Map<String, int> categoryExpense = {};
+    int minDailyExpense = -1;
+    String? minDay;
+    final Map<String, int> dailyExpense = {};
+
+    for (final t in data as List) {
+      final m = t as Map;
+      final amount = (m['amount'] as int).abs();
+      if (m['type'] == 'income') {
+        income += amount;
+      } else {
+        expense += amount;
+        final catName = (m['categories'] as Map?)?['name'] as String? ?? 'Lainnya';
+        categoryExpense[catName] = (categoryExpense[catName] ?? 0) + amount;
+        final day = (m['date'] as String).substring(8);
+        dailyExpense[day] = (dailyExpense[day] ?? 0) + amount;
+      }
+    }
+
+    for (final entry in dailyExpense.entries) {
+      if (minDailyExpense == -1 || entry.value < minDailyExpense) {
+        minDailyExpense = entry.value;
+        minDay = entry.key;
+      }
+    }
+
+    final sortedCats = categoryExpense.entries.toList()..sort((a, b) => b.value.compareTo(a.value));
+    final topCat = sortedCats.isNotEmpty ? sortedCats.first.key : '-';
+    final topCatPct = expense > 0 && sortedCats.isNotEmpty ? (sortedCats.first.value / expense * 100).round() : 0;
+
+    final dayNames = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+    final minDayName = minDay != null
+        ? dayNames[DateTime(now.year, now.month, int.parse(minDay)).weekday % 7]
+        : '-';
+
+    return {
+      'income': income,
+      'expense': expense,
+      'balance': income - expense,
+      'savingsRate': income > 0 ? ((income - expense) / income * 100).round() : 0,
+      'topCategory': topCat,
+      'topCategoryPct': topCatPct,
+      'frugalDay': minDayName,
+      'frugalAmount': minDailyExpense < 0 ? 0 : minDailyExpense,
+      'categoryExpense': categoryExpense,
+    };
+  }
+
+  Future<List<Map<String, dynamic>>> getMonthlyHistory({int months = 6}) async {
+    final now = DateTime.now();
+    final results = <Map<String, dynamic>>[];
+
+    for (int i = months - 1; i >= 0; i--) {
+      final date = DateTime(now.year, now.month - i, 1);
+      final start = date.toIso8601String().split('T')[0];
+      final end = DateTime(date.year, date.month + 1, 0).toIso8601String().split('T')[0];
+      final label = DateFormat('MMM', 'id').format(date);
+
+      final data = await _client
+          .from('transactions')
+          .select('amount, type')
+          .eq('user_id', _userId)
+          .gte('date', start)
+          .lte('date', end);
+
+      int income = 0, expense = 0;
+      for (final t in data as List) {
+        final m = t as Map;
+        final amount = (m['amount'] as int).abs();
+        if (m['type'] == 'income') {
+          income += amount;
+        } else {
+          expense += amount;
+        }
+      }
+
+      results.add({'label': label, 'income': income, 'expense': expense});
+    }
+
+    return results;
+  }
+
+  Future<List<Map<String, dynamic>>> getWeeklyExpense({int days = 7}) async {
+    final now = DateTime.now();
+    final results = <Map<String, dynamic>>[];
+    final dayNames = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
+
+    for (int i = days - 1; i >= 0; i--) {
+      final date = now.subtract(Duration(days: i));
+      final dateStr = date.toIso8601String().split('T')[0];
+      final dayLabel = dayNames[date.weekday % 7];
+
+      final data = await _client
+          .from('transactions')
+          .select('amount')
+          .eq('user_id', _userId)
+          .eq('type', 'expense')
+          .eq('date', dateStr);
+
+      int total = 0;
+      for (final t in data as List) {
+        total += (t['amount'] as int).abs();
+      }
+
+      results.add({'label': dayLabel, 'amount': total});
+    }
+
+    return results;
+  }
+
+  Future<List<Map<String, dynamic>>> getExpenseByCategory({int? month, int? year}) async {
+    final now = DateTime.now();
+    final m = month ?? now.month;
+    final y = year ?? now.year;
+    final start = DateTime(y, m, 1).toIso8601String().split('T')[0];
+    final end = DateTime(y, m + 1, 0).toIso8601String().split('T')[0];
+
+    final data = await _client
+        .from('transactions')
+        .select('amount, category_id, categories(name)')
+        .eq('user_id', _userId)
+        .eq('type', 'expense')
+        .gte('date', start)
+        .lte('date', end);
+
+    final Map<String, int> catMap = {};
+    for (final t in data as List) {
+      final m2 = t as Map;
+      final name = (m2['categories'] as Map?)?['name'] as String? ?? 'Lainnya';
+      catMap[name] = (catMap[name] ?? 0) + (m2['amount'] as int).abs();
+    }
+
+    final sorted = catMap.entries.toList()..sort((a, b) => b.value.compareTo(a.value));
+    return sorted.map((e) => {'name': e.key, 'amount': e.value}).toList();
+  }
+
+  Future<void> addCategory(String name, String icon, String color, String type) async {
+    await _client.from('categories').insert({
+      'user_id': _userId,
+      'name': name,
+      'icon': icon,
+      'color': color,
+      'type': type,
+      'is_default': false,
+    });
+  }
+
+  Future<void> updateCategory(String id, String name, String icon, String color) async {
+    await _client.from('categories').update({'name': name, 'icon': icon, 'color': color}).eq('id', id);
+  }
+
+  Future<bool> deleteCategory(String id) async {
+    final refs = await _client.from('transactions').select('id').eq('category_id', id).limit(1);
+    if ((refs as List).isNotEmpty) return false;
+    await _client.from('categories').delete().eq('id', id);
+    return true;
   }
 }
