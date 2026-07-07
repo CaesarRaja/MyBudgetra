@@ -69,9 +69,9 @@ class TransactionRepository {
     for (final t in todayData as List) {
       final m = t as Map;
       if (m['type'] == 'income') {
-        todayIncome += m['amount'] as int;
+        todayIncome += (m['amount'] as int).abs();
       } else {
-        todayExpense += m['amount'] as int;
+        todayExpense += (m['amount'] as int).abs();
       }
     }
 
@@ -79,7 +79,7 @@ class TransactionRepository {
     for (final t in monthlyData as List) {
       final m = t as Map;
       if (m['type'] == 'expense') {
-        monthlyTotal += m['amount'] as int;
+        monthlyTotal += (m['amount'] as int).abs();
         monthlyCount++;
       }
     }

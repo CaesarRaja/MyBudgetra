@@ -94,7 +94,10 @@ class _MainShellState extends State<MainShell> {
       ),
       bottomNavigationBar: BottomNav(
         currentIndex: _currentIndex,
-        onTap: (i) => setState(() => _currentIndex = i),
+        onTap: (i) {
+          setState(() => _currentIndex = i);
+          if (i == 0) _homeKey.currentState?.refresh();
+        },
       ),
     );
   }

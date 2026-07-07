@@ -44,7 +44,10 @@ class _TransactionPageState extends State<TransactionPage> {
 
   Future<void> _editTransaction(TransactionModel t) async {
     final result = await showAddTransactionSheet(context, transaction: t);
-    if (result == true) _load();
+    if (result == true) {
+      _load();
+      widget.onTransactionAdded?.call();
+    }
   }
 
   Future<void> _deleteTransaction(TransactionModel t) async {
@@ -66,6 +69,7 @@ class _TransactionPageState extends State<TransactionPage> {
       try {
         await _repo.deleteTransaction(t.id!);
         _load();
+        widget.onTransactionAdded?.call();
       } catch (e) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(

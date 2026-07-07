@@ -3,7 +3,9 @@ import 'package:flutter/services.dart';
 import '../config/theme.dart';
 import '../config/supabase.dart';
 import '../models/transaction_model.dart';
+import '../models/category_model.dart';
 import '../repositories/transaction_repository.dart';
+import '../widgets/stats_card.dart';
 
 Future<bool?> showAddTransactionSheet(BuildContext context, {TransactionModel? transaction}) {
   return showModalBottomSheet<bool>(
@@ -28,6 +30,9 @@ class _AddTransactionSheetState extends State<_AddTransactionSheet> {
   final _amountController = TextEditingController();
   String _type = 'expense';
   bool _loading = false;
+  List<CategoryModel> _categories = [];
+  List<CategoryModel> _filteredCategories = [];
+  String? _selectedCategoryId;
 
   bool get _isEdit => widget.transaction != null;
 
@@ -40,14 +45,43 @@ class _AddTransactionSheetState extends State<_AddTransactionSheet> {
       _descController.text = t.description;
       _type = t.type;
     }
+    _loadCategories();
   }
 
-  void _switchType(String type) => setState(() => _type = type);
+  Future<void> _loadCategories() async {
+    try {
+      final cats = await _repo.getCategories();
+      setState(() {
+        _categories = cats;
+        _applyFilter();
+        if (_isEdit && widget.transaction!.categoryId != null) {
+          _selectedCategoryId = widget.transaction!.categoryId;
+        }
+      });
+    } catch (_) {}
+  }
+
+  void _applyFilter() {
+    _filteredCategories = _categories.where((c) => c.type == _type).toList();
+    if (_selectedCategoryId != null && !_filteredCategories.any((c) => c.id == _selectedCategoryId)) {
+      _selectedCategoryId = null;
+    }
+  }
+
+  void _switchType(String type) {
+    setState(() {
+      _type = type;
+      _applyFilter();
+      if (_filteredCategories.isNotEmpty && _selectedCategoryId == null) {
+        _selectedCategoryId = _filteredCategories.first.id;
+      }
+    });
+  }
 
   Future<void> _save() async {
-    if (_amountController.text.isEmpty || _descController.text.isEmpty) {
+    if (_amountController.text.isEmpty || _descController.text.isEmpty || _selectedCategoryId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Lengkapi nominal dan deskripsi'), backgroundColor: BudgetraColors.warning),
+        const SnackBar(content: Text('Lengkapi nominal, kategori, dan deskripsi'), backgroundColor: BudgetraColors.warning),
       );
       return;
     }
@@ -63,7 +97,7 @@ class _AddTransactionSheetState extends State<_AddTransactionSheet> {
           TransactionModel(
             id: t.id,
             userId: user.id,
-            categoryId: t.categoryId,
+            categoryId: _selectedCategoryId,
             amount: _type == 'expense' ? -amount : amount,
             description: _descController.text.trim(),
             type: _type,
@@ -74,6 +108,7 @@ class _AddTransactionSheetState extends State<_AddTransactionSheet> {
         await _repo.addTransaction(
           TransactionModel(
             userId: user.id,
+            categoryId: _selectedCategoryId,
             amount: _type == 'expense' ? -amount : amount,
             description: _descController.text.trim(),
             type: _type,
@@ -216,6 +251,61 @@ class _AddTransactionSheetState extends State<_AddTransactionSheet> {
                             child: Icon(Icons.close_rounded, color: BudgetraColors.lightMutedFg, size: 20),
                           ),
                       ],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text('Pilih kategori', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: BudgetraColors.lightMutedFg)),
+                  ),
+                  const SizedBox(height: 8),
+                  SizedBox(
+                    height: 200,
+                    child: GridView.builder(
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 4,
+                        mainAxisSpacing: 8,
+                        crossAxisSpacing: 8,
+                        childAspectRatio: 0.85,
+                      ),
+                      itemCount: _filteredCategories.length,
+                      itemBuilder: (ctx, i) {
+                        final cat = _filteredCategories[i];
+                        final selected = _selectedCategoryId == cat.id;
+                        return GestureDetector(
+                          onTap: () => setState(() => _selectedCategoryId = cat.id),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: selected
+                                  ? BudgetraColors.primary.withValues(alpha: 0.1)
+                                  : BudgetraColors.lightSurfaceLow,
+                              borderRadius: BorderRadius.circular(14),
+                              border: Border.all(
+                                color: selected ? BudgetraColors.primary : Colors.transparent,
+                                width: 2,
+                              ),
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                CategoryIcon(category: cat.name),
+                                const SizedBox(height: 4),
+                                Text(
+                                  cat.name.length > 7 ? '${cat.name.substring(0, 6)}.' : cat.name,
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+                                    color: selected ? BudgetraColors.primary : BudgetraColors.lightFg,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
                     ),
                   ),
                   const SizedBox(height: 16),
